@@ -6,7 +6,7 @@ const loginVerify = async (req, res, next) => {
     const { authorization } = req.headers;
 
     if (!authorization) {
-        res.status(404).json({ message: 'Token não informado' });
+        res.status(401).json({ message: "Para acessar este recurso um token de autenticação válido deve ser enviado." });
     };
 
     try {
