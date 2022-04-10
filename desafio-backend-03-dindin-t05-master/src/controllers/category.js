@@ -5,13 +5,12 @@ const categoryList = async (req, res) => {
     const { user } = req;
 
     try {
-        const categories = await connection.query(`select categorias.id, categorias.descricao from transacoes 
-        left join 
-        usuarios on 
-        transacoes.usuario_id = usuarios.id 
-        left join 
-        categorias on 
-        transacoes.categoria_id = categorias.id where usuarios.id = $1`, [user.id]);
+        const categories = await connection.query(`select  categorias.id, categorias.descricao from transacoes
+        left join usuarios on transacoes.usuario_id = usuarios.id 
+        left join categorias on transacoes.categoria_id = categorias.id 
+        where usuarios.id = $1
+        group by categorias.descricao
+        `, [user.id]);
 
         return res.status(200).json(categories.rows);
     } catch (error) {
