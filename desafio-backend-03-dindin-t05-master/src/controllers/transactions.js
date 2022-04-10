@@ -1,6 +1,5 @@
 const connection = require('../connection');
 
-//verificar se está correto depois
 const listTransactions = async (req, res) => {
     const { user } = req;
 
@@ -24,7 +23,27 @@ const detailTransaction = async (req, res) => {
     const { user } = req;
 
     try {
+        const queryResponseTransaction = `select 
+        transacoes.id, 
+        transacoes.tipo, 
+        transacoes.descricao, 
+        transacoes.valor, 
+        transacoes.data, 
+        transacoes.usuario_id, 
+        transacoes.categoria_id, 
+        categorias.descricao as categoria_nome 
+        from transacoes 
+        left join categorias 
+        on transacoes.categoria_id = categorias.id 
+        where transacoes.id = $1 AND usuario_id = $2`;
 
+        const responseTransaction = await connection.query(queryResponseTransaction, [id, user.id]);
+
+        if (responseTransaction.rowCount === 0) {
+            res.status(404).json({ message: "Transação não encontrada" });
+        }
+
+        return res.status(200).json(responseTransaction.rows);
     } catch (error) {
         return res.status(400).json({ message: error.message });
     }
@@ -77,7 +96,7 @@ const registerTransaction = async (req, res) => {
 
         const responseTransaction = await connection.query(queryResponseTransaction, [allTransaction.rowCount]);
 
-        return res.status(200).json(responseTransaction.rows);
+        return res.status(201).json(responseTransaction.rows);
     } catch (error) {
         return res.status(400).json({ message: error.message });
     }

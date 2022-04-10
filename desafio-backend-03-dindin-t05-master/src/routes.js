@@ -19,7 +19,7 @@ routes.put('/usuario', updateUser);
 routes.get('/categoria', categories);
 
 routes.get('/transacao', listTransactions);
-// routes.get('/transacao/:id', detailTransaction);
+routes.get('/transacao/:id', detailTransaction);
 routes.post('/transacao', registerTransaction);
 
 module.exports = routes;
