@@ -3,6 +3,7 @@ const { registerUser, detailUser, updateUser } = require('./controllers/users');
 const login = require('./controllers/login');
 const loginVerify = require('./filters/loginVerify');
 const categories = require('./controllers/category');
+const { listTransactions, detailTransaction, registerTransaction } = require('./controllers/transactions');
 
 const routes = express();
 
@@ -16,5 +17,9 @@ routes.get('/usuario', detailUser);
 routes.put('/usuario', updateUser);
 
 routes.get('/categoria', categories);
+
+routes.get('/transacao', listTransactions);
+// routes.get('/transacao/:id', detailTransaction);
+routes.post('/transacao', registerTransaction);
 
 module.exports = routes;
