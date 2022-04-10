@@ -15,12 +15,13 @@ CREATE TABLE IF NOT EXISTS categorias(
 CREATE TABLE IF NOT EXISTS transacoes(
   id serial PRIMARY KEY,
   descricao text NOT NULL,
-  valor text NOT NULL,
+  valor int NOT NULL,
   data timestamptz NOT NULL,
   categoria_id integer NOT NULL,
   usuario_id integer NOT NULL,
   FOREIGN KEY (categoria_id) REFERENCES categorias(id),
-  FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+  tipo text NOT NULL
 );
 
 INSERT INTO categorias
