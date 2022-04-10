@@ -57,14 +57,14 @@ const registerTransaction = async (req, res) => {
     };
 
     if (type !== "entrada" && type !== "saida") {
-        return res.status(400).json({ message: "Defina o campo tipo como 'entrada' ou 'saida'." })
+        return res.status(400).json({ message: "Defina o campo 'tipo' como 'entrada' ou 'saida'." })
     };
 
     try {
         const checkCategory = await connection.query('select * from categorias where id = $1', [idcategory]);
 
         if (checkCategory.rowCount === 0) {
-            return res.status(400).json({ message: "A categoria informada não existe." });
+            return res.status(404).json({ message: "A categoria informada não existe." });
         }
 
         const queryTransactionRegister = `insert into transacoes 
@@ -99,10 +99,55 @@ const registerTransaction = async (req, res) => {
     } catch (error) {
         return res.status(400).json({ message: error.message });
     }
-}
+};
+
+const updateTransaction = async (req, res) => {
+    const { description, amount, date, idcategory, type } = req.body;
+    const { id } = req.params;
+    const { user } = req;
+
+    if (!description || !amount || !date || !idcategory || !type) {
+        return res.status(400).json({ message: "Todos os campos obrigatórios devem ser informados." });
+    };
+
+    if (type !== "entrada" && type !== "saida") {
+        return res.status(400).json({ message: "Defina o campo 'tipo' como 'entrada' ou 'saida'." })
+    };
+
+    try {
+        const checkCategory = await connection.query('select * from categorias where id = $1', [idcategory]);
+
+        if (checkCategory.rowCount === 0) {
+            return res.status(404).json({ message: "A categoria informada não existe." });
+        };
+
+        const checkTransaction = await connection.query('select * from transacoes where id = $1', [id]);
+
+        if (checkTransaction.rowCount === 0) {
+            return res.status(404).json({ message: "A transação informada não existe." });
+        };
+
+        if (checkTransaction.rows[0].usuario_id !== user.id) {
+            return res.status(403).json({ message: "O usuário informado não tem permissão para acessar a transação solicitada." });
+        };
+
+        const queryTransactionUpdate = `update transacoes set
+        descricao = $1, valor = $2, data =$3, categoria_id = $4, usuario_id =$5, tipo = $6 where id = $7 and usuario_id = $8`;
+        const transactionUpdate = await connection.query(queryTransactionUpdate, [description, amount, date, idcategory, user.id, type, id, user.id]);
+
+        if (transactionUpdate.rowCount === 0) {
+            return res.status(400).json({ message: "Não foi possível atualizar a transação." });
+        };
+
+        return res.status(204).json();
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    };
+};
 
 module.exports = {
     listTransactions,
     detailTransaction,
-    registerTransaction
+    registerTransaction,
+    updateTransaction
 }
