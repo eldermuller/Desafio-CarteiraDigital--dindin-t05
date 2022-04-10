@@ -17,7 +17,6 @@ const listTransactions = async (req, res) => {
     }
 };
 
-//falta terminar essa
 const detailTransaction = async (req, res) => {
     const { id } = req.params;
     const { user } = req;
