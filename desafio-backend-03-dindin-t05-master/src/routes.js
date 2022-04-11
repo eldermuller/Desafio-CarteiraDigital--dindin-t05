@@ -7,7 +7,8 @@ const { listTransactions,
     detailTransaction,
     registerTransaction,
     updateTransaction,
-    deleteTransaction } = require('./controllers/transactions');
+    deleteTransaction,
+    transactionStatement } = require('./controllers/transactions');
 
 const routes = express();
 
@@ -24,6 +25,7 @@ routes.put('/usuario', updateUser);
 routes.get('/categoria', categories);
 
 routes.get('/transacao', listTransactions);
+routes.get('/transacao/extrato', transactionStatement);
 routes.get('/transacao/:id', detailTransaction);
 routes.post('/transacao', registerTransaction);
 routes.put('/transacao/:id', updateTransaction);

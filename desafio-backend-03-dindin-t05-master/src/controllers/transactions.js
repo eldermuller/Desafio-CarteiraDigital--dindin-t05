@@ -173,12 +173,29 @@ const deleteTransaction = async (req, res) => {
         return res.status(400).json({ message: error.message });
     }
 
-}
+};
+
+const transactionStatement = async (req, res) => {
+    const { user } = req;
+
+    try {
+
+        const queryStatementTransaction = 'select sum(valor) from transacoes where usuario_id = $1 group by transacoes.tipo';
+        const statementTransaction = await connection.query(queryStatementTransaction, [user.id]);
+
+        console.log(statementTransaction.rows);
+
+        return res.status(200).json(statementTransaction.rows);
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+};
 
 module.exports = {
     listTransactions,
     detailTransaction,
     registerTransaction,
     updateTransaction,
-    deleteTransaction
+    deleteTransaction,
+    transactionStatement
 }

@@ -3,11 +3,11 @@ const secret = require('../secret');
 const jwt = require('jsonwebtoken');
 
 const loginVerify = async (req, res, next) => {
-    // const { authorization } = req.headers;
+    const { authorization } = req.headers;
 
-    // if (!authorization) {
-    //     res.status(401).json({ message: "Para acessar este recurso um token de autenticação válido deve ser enviado." });
-    // };
+    if (!authorization) {
+        res.status(401).json({ message: "Para acessar este recurso um token de autenticação válido deve ser enviado." });
+    };
 
     try {
         const token = authorization.replace('Bearer', '').trim();
