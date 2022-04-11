@@ -9,11 +9,6 @@ import { getItem, setItem } from '../../utils/storage';
 
 function SignIn() {
     const navigate = useNavigate()
-    const [usuarioInfo, setUsuarioInfo] = useState({
-        id: null,
-        name: '',
-        email: ''
-    })
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [dataWarning, setDataWarning] = useState('')
@@ -45,11 +40,9 @@ function SignIn() {
                 password
             });
 
-            //setUsuarioInfo precisa ser realizado na página Main. Preciso mandar o response.data.info pra ele
-            //Posso mandar pelo localStorage, ou posso usar uma funcção como prop de alguma forma
-
             const token = response.data.token
             setItem('token', token)
+            setItem('id', response.data.info.id)
 
         } catch (error) {
             setDataWarning(error.response.data)
