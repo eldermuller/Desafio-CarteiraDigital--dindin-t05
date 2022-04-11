@@ -18,8 +18,8 @@ const listTransactions = async (req, res) => {
 };
 
 const detailTransaction = async (req, res) => {
-    const { id } = req.params;
     const { user } = req;
+    const { id } = req.params;
 
     try {
         const queryResponseTransaction = `select 
@@ -48,9 +48,10 @@ const detailTransaction = async (req, res) => {
     }
 }
 
+//rever isso aqui, quebra depois que você deleta transações
 const registerTransaction = async (req, res) => {
-    const { description, amount, date, idcategory, type } = req.body;
     const { user } = req;
+    const { description, amount, date, idcategory, type } = req.body;
 
     if (!description || !amount || !date || !idcategory || !type) {
         return res.status(400).json({ message: "Todos os campos obrigatórios devem ser informados." });
@@ -102,9 +103,9 @@ const registerTransaction = async (req, res) => {
 };
 
 const updateTransaction = async (req, res) => {
-    const { description, amount, date, idcategory, type } = req.body;
-    const { id } = req.params;
     const { user } = req;
+    const { id } = req.params;
+    const { description, amount, date, idcategory, type } = req.body;
 
     if (!description || !amount || !date || !idcategory || !type) {
         return res.status(400).json({ message: "Todos os campos obrigatórios devem ser informados." });
@@ -124,7 +125,7 @@ const updateTransaction = async (req, res) => {
         const checkTransaction = await connection.query('select * from transacoes where id = $1', [id]);
 
         if (checkTransaction.rowCount === 0) {
-            return res.status(404).json({ message: "A transação informada não existe." });
+            return res.status(404).json({ message: "A transação informada não foi encontrada." });
         };
 
         if (checkTransaction.rows[0].usuario_id !== user.id) {
@@ -145,9 +146,39 @@ const updateTransaction = async (req, res) => {
     };
 };
 
+const deleteTransaction = async (req, res) => {
+    const { user } = req;
+    const { id } = req.params;
+
+    try {
+        const checkTransaction = await connection.query('select * from transacoes where id = $1', [id]);
+
+        if (checkTransaction.rowCount === 0) {
+            return res.status(404).json({ message: "A transação informada não foi encontrada." });
+        };
+
+        if (checkTransaction.rows[0].usuario_id !== user.id) {
+            return res.status(403).json({ message: "O usuário informado não tem permissão para acessar a transação solicitada." });
+        };
+
+        const queryTransactionDelete = 'delete from transacoes where id = $1';
+        const transactionDelete = await connection.query(queryTransactionDelete, [id]);
+
+        if (transactionDelete.rowCount === 0) {
+            return res.status(400).json({ message: "Não foi possível deletar a transação solictada" });
+        }
+
+        return res.status(204).json({});
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+
+}
+
 module.exports = {
     listTransactions,
     detailTransaction,
     registerTransaction,
-    updateTransaction
+    updateTransaction,
+    deleteTransaction
 }

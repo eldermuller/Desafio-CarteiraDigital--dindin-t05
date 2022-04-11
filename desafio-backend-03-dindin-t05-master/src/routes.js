@@ -6,7 +6,8 @@ const categories = require('./controllers/category');
 const { listTransactions,
     detailTransaction,
     registerTransaction,
-    updateTransaction } = require('./controllers/transactions');
+    updateTransaction,
+    deleteTransaction } = require('./controllers/transactions');
 
 const routes = express();
 
@@ -26,5 +27,6 @@ routes.get('/transacao', listTransactions);
 routes.get('/transacao/:id', detailTransaction);
 routes.post('/transacao', registerTransaction);
 routes.put('/transacao/:id', updateTransaction);
+routes.delete('/transacao/:id', deleteTransaction);
 
 module.exports = routes;
