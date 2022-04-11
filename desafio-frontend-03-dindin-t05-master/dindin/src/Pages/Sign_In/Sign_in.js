@@ -2,12 +2,26 @@ import './styles.css';
 import Header from '../../components/header';
 import { useNavigate } from 'react-router-dom'
 import api from '../../services/api'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getItem, setItem } from '../../utils/storage';
+
+
 
 function SignIn() {
     const navigate = useNavigate()
+    const [usuarioInfo, setUsuarioInfo] = useState({
+        id: null,
+        name: '',
+        email: ''
+    })
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [dataWarning, setDataWarning] = useState('')
+
+    useEffect(() => {
+        const token = getItem('token')
+        if (token) { navigate('/main') }
+    })
 
     function handleToSignUp() {
         navigate('/signup')
@@ -15,26 +29,31 @@ function SignIn() {
 
     async function handleSubmit(e) {
         e.preventDefault()
-        let missingData = 0
 
-        if (!email) { missingData = 1 }
-        if (!password) { missingData += 2 }
-        if (missingData === 1) { return console.log('Favor preencher o email'); }
-        if (missingData === 2) { return console.log('Favor preencher a senha'); }
-        if (missingData === 3) { return console.log('Favor preencher o email e a senha'); }
+        if (!email || !password) {
+            setDataWarning('Favor preencher todos os campos');
+
+            setTimeout(() => {
+                setDataWarning('')
+            }, 3000)
+            return
+        }
 
         try {
-            // const test = await api.get('/')
-            // console.log(test.data);
-            //código para testar a api assim que tiver
-            // const response = await api.post('/', {
-            //     email,
-            //     password
-            // })
-            console.log('wait');
+            const response = await api.post('/login', {
+                email,
+                password
+            });
+
+            //setUsuarioInfo precisa ser realizado na página Main. Preciso mandar o response.data.info pra ele
+            //Posso mandar pelo localStorage, ou posso usar uma funcção como prop de alguma forma
+
+            const token = response.data.token
+            setItem('token', token)
 
         } catch (error) {
-            console.log(error.message);
+            setDataWarning(error.response.data)
+            return console.log(error.response.status);
         }
 
         navigate('/main')
@@ -52,33 +71,40 @@ function SignIn() {
                         onClick={handleToSignUp}
                     >Cadastre-se</button>
                 </div>
-                <form
-                    className='right-container form-n-modal'
-                    onSubmit={handleSubmit}
-                >
-                    <h3>Login</h3>
-                    <div className='input-label'>
-                        <label htmlFor='email'>E-mail</label>
-                        <input
-                            id='email'
-                            name='email'
-                            type='text'
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        ></input>
-                    </div>
-                    <div className='input-label'>
-                        <label htmlFor='password'>Senha</label>
-                        <input
-                            id='password'
-                            name='password'
-                            type='password'
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        ></input>
-                    </div>
-                    <button className='btn-entrar'>Entrar</button>
-                </form>
+                <div className='right-container'>
+                    {dataWarning &&
+                        <div className='data-warning-sign-in'>
+                            {dataWarning}
+                        </div>
+                    }
+                    <form
+                        className='right-container-form form-n-modal'
+                        onSubmit={handleSubmit}
+                    >
+                        <h3>Login</h3>
+                        <div className='input-label'>
+                            <label htmlFor='email'>E-mail</label>
+                            <input
+                                id='email'
+                                name='email'
+                                type='text'
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            ></input>
+                        </div>
+                        <div className='input-label'>
+                            <label htmlFor='password'>Senha</label>
+                            <input
+                                id='password'
+                                name='password'
+                                type='password'
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            ></input>
+                        </div>
+                        <button className='btn-entrar'>Entrar</button>
+                    </form>
+                </div>
             </div>
         </div>
     );

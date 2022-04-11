@@ -1,10 +1,9 @@
 .container-sign-in {
-    width: 100%;
-
     margin-top: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
+
 }
 
 
@@ -33,7 +32,8 @@
     margin-bottom: 54px;
 }
 
-button {
+.btn-entrar,
+.btn-to-sign-up {
     border: none;
     border-radius: 5px;
 
@@ -51,11 +51,41 @@ button {
 }
 
 .right-container {
+    position: relative;
+}
+
+.data-warning-sign-in {
+    position: absolute;
+    top: -50px;
+    left: 92px;
+    color: white;
+
+    font-family: 'Rubik', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+
+
+    background-color: transparent;
+
+    width: 513px;
+    padding: 5px;
+
+    text-align: center;
+    border-radius: 5px;
+}
+
+.right-container-form {
     width: 513px;
     height: 535px;
 
     margin-left: 91px;
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
 }
+
 
 .right-container h3 {
     font-weight: 500;

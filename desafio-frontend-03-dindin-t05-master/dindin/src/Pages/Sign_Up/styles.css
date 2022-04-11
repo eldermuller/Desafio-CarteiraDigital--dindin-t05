@@ -10,14 +10,14 @@
 }
 
 
-.data-warning-div {
+.data-warning-sign-up {
     position: absolute;
-    top: 0px;
+    top: -20px;
     color: white;
 
     font-family: 'Rubik', sans-serif;
     font-weight: 700;
-    font-size: 22px;
+    font-size: 16px;
 
 
     background-color: transparent;
@@ -59,6 +59,16 @@
     height: 52px;
 
     margin-bottom: 10px;
+
+    border: none;
+    border-radius: 5px;
+
+    background-color: rgba(121, 120, 217, 1);
+    color: white;
+
+    font-family: 'Rubik', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
 }
 
 .link-to-sign-in {

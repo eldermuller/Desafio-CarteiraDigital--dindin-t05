@@ -1,9 +1,9 @@
 import './styles.css';
 import Header from '../../components/header';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
-
+import { getItem } from '../../utils/storage';
 
 export default function SignUp() {
     const [name, setName] = useState('')
@@ -13,25 +13,29 @@ export default function SignUp() {
     const [dataWarning, setDataWarning] = useState('')
     const navigate = useNavigate()
 
+    useEffect(() => {
+        const token = getItem('token')
+        if (token) { navigate('/main') }
+    })
+
+    function handleErrorMessage(msg) {
+        setDataWarning(msg)
+
+        setTimeout(() => {
+            setDataWarning('')
+        }, 3000)
+        return
+    }
+
     async function handleSubmitSignUp(e) {
         e.preventDefault()
 
         if (!name || !email || !password || !passwordConfirmation) {
-            setDataWarning('Todos os dados precisam ser preenchidos.')
-
-            setTimeout(() => {
-                setDataWarning('')
-            }, 3000)
-            return
+            return handleErrorMessage('Todos os dados precisam ser preenchidos.')
         }
 
         if (password !== passwordConfirmation) {
-            setDataWarning('A senha não confere.')
-
-            setTimeout(() => {
-                setDataWarning('')
-            }, 3000)
-            return
+            return handleErrorMessage('A senha não confere.')
         }
 
         try {
@@ -42,7 +46,8 @@ export default function SignUp() {
             })
 
         } catch (error) {
-            console.log(error);
+            handleErrorMessage(error.response.data)
+            return console.log(error.response);
         }
 
         navigate('/')
@@ -54,7 +59,7 @@ export default function SignUp() {
             <Header />
             <div className='container-sign-up'>
                 {dataWarning &&
-                    <div className='data-warning-div'>
+                    <div className='data-warning-sign-up'>
                         {dataWarning}
                     </div>
                 }
