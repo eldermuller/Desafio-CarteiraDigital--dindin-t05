@@ -9,6 +9,7 @@ const loginVerify = async (req, res, next) => {
         res.status(401).json({ message: "Para acessar este recurso um token de autenticação válido deve ser enviado." });
     };
 
+
     try {
         const token = authorization.replace('Bearer', '').trim();
 

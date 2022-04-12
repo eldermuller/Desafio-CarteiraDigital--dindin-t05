@@ -1,12 +1,16 @@
 import './styles.css'
 import editIcon from '../../assets/edit_icon.svg'
 import deleteIcon from '../../assets/delete_icon.svg'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { format, getDay, parseISO } from 'date-fns'
 
 
 export default function Transacao({ transactionData, deleteBoxOpen, setDeleteBoxOpen }) {
 
     const [localDeleteBox, setLocalDeleteBox] = useState(deleteBoxOpen)
+    const [weekDay, setWeekDay] = useState('')
+    const [formattedDate, setFormattedDate] = useState('')
+
 
     function handleDeleteConfirmation() {
         if (deleteBoxOpen) return;
@@ -19,6 +23,22 @@ export default function Transacao({ transactionData, deleteBoxOpen, setDeleteBox
         setLocalDeleteBox(false)
     }
 
+    function dateInfo(date) {
+        const timeDate = parseISO(date)
+        setFormattedDate(format(timeDate, 'dd/MM/yy'))
+
+        const weekDayNumber = getDay(timeDate)
+
+        if (weekDayNumber === 0) { setWeekDay('Domingo') }
+        if (weekDayNumber === 1) { setWeekDay('Segunda-Feira') }
+        if (weekDayNumber === 2) { setWeekDay('Terça-Feira') }
+        if (weekDayNumber === 3) { setWeekDay('Quarta-Feira') }
+        if (weekDayNumber === 4) { setWeekDay('Quinta-Feira') }
+        if (weekDayNumber === 5) { setWeekDay('Sexta-Feira') }
+        if (weekDayNumber === 6) { setWeekDay('Sábado') }
+
+    }
+
     const tipoTransacao = () => {
         if (transactionData.tipo === 'entrada') {
             return true
@@ -28,31 +48,34 @@ export default function Transacao({ transactionData, deleteBoxOpen, setDeleteBox
         }
     }
 
-    const valorFormatado = () => {
+    const formattedValue = () => {
         const valor = (transactionData.valor / 100).toFixed(2)
         return valor.replace('.', ',')
     }
 
+    useEffect(() => {
+        dateInfo(transactionData.data)
+    }, [])
 
     return (
         <div>
             <div className='transaction-row'>
                 <span
                     className='info-data info'
-                >{transactionData.data}</span>
+                >{formattedDate}</span>
                 <span
                     className='info-dia info'
-                >{transactionData.diaDaSemana}</span>
+                >{weekDay}</span>
                 <span
                     className='info-descricao info'
                 >{transactionData.descricao}</span>
                 <span
                     className='info-categoria info'
-                >{transactionData.categoria}</span>
+                >{transactionData.categoria_id}</span>
                 <span
                     className='info-valor info'
                     style={tipoTransacao() ? { color: 'rgb(123, 97, 255)' } : { color: 'rgb(250, 140, 16)' }}
-                >{valorFormatado()}</span>
+                >{formattedValue()}</span>
                 <img
                     src={editIcon}
                     alt='edit'

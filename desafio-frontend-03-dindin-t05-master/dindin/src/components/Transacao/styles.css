@@ -93,6 +93,13 @@
 }
 
 .sim-delete,
+.nao-delete,
+.delete-icon,
+.edit-icon {
+    cursor: pointer;
+}
+
+.sim-delete,
 .nao-delete {
     width: 42px;
     height: 22px;

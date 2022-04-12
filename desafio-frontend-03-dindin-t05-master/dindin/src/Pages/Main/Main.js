@@ -4,19 +4,22 @@ import Transacao from '../../components/Transacao/transacao'
 import Resumo from '../../components/Resumo/Resumo'
 import filterIcon from '../../assets/filtrar_icon.svg'
 import dateUpArrow from '../../assets/data_up_arrow.svg'
-import fakedata from '../../utils/fakedata'
 import { useEffect, useState } from 'react'
 import { getItem } from '../../utils/storage'
 import api from '../../services/api'
+import AddRegister from '../../components/adicionar_registro/add_register'
 
 
 
 export default function Main() {
     const [deleteBoxOpen, setDeleteBoxOpen] = useState(false)
+    const [transactionArray, setTransactionArray] = useState([])
     const [user, setUser] = useState({ id: null, nome: '', email: '' })
+    const [showAddRegister, setShowAddRegister] = useState(false)
     const token = getItem('token')
 
-    async function fetchUserData(res, req) {
+
+    async function fillUserData(res, req) {
         try {
             const response = await api.get('/usuario',
                 {
@@ -24,34 +27,45 @@ export default function Main() {
                         Authorization: `Bearer ${token}`
                     }
                 })
-
-            setUser({ ...response.data })
+            return setUser({ ...response.data })
         } catch (error) {
-            res.status(400).json(error.response.data.message)
+            return res.status(400).json(error.response.data.message)
         }
     }
 
-    async function fillUserTransactions(res, req) {
-        try {
-            const response = await api.get('/transacao', user) //o que fazer aqui? Lá ele recebe user desestruturado do body
 
-            console.log(response.data);
+    async function createTransactionArray(req, res) {
+        try {
+            const response = await api.get('/transacao',
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+
+            setTransactionArray(response.data);
         } catch (error) {
-            res.status(400).json(error.response.data.message)
+            return res.status(400).json(error.response.data.message)
         }
+    }
+
+    function openAddRegisterModal() {
+        setShowAddRegister(true)
     }
 
     useEffect(() => {
-        fetchUserData()
-        fillUserTransactions()
+        fillUserData()
+        createTransactionArray()
+        //ver com os professores sobre essa espécie de atraso
+        console.log(transactionArray);
     }, [])
 
-    console.log(user);
+
     return (
         <div className='body-clean'>
             <Header
                 token={token}
-                name={user.nome}
+                userName={user.nome}
             />
             <div className='container-main'>
                 <button className='filter-btn' >
@@ -81,7 +95,7 @@ export default function Main() {
                             </div>
                         </div>
                         <div>
-                            {fakedata.map((data) => (
+                            {transactionArray.map((data) => (
                                 <Transacao
                                     key={data.id}
                                     transactionData={data}
@@ -93,10 +107,18 @@ export default function Main() {
                     </div>
                     <div className='right-inner-container'>
                         <Resumo
+                            transactionArray={transactionArray}
+                            openAddRegisterModal={openAddRegisterModal}
                         />
                     </div>
                 </div>
             </div>
+            {showAddRegister &&
+                <AddRegister
+                    showAddRegister={showAddRegister}
+                    setShowAddRegister={setShowAddRegister}
+                />
+            }
         </div>
 
     )
