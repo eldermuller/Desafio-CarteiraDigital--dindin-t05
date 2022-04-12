@@ -78,7 +78,7 @@ const registerTransaction = async (req, res) => {
             return res.status(400).json({ message: "Não foi possível registrar a transação." });
         }
 
-        const allTransaction = await connection.query('select * from transacoes');
+        const allTransaction = await connection.query('select max(id) from transacoes where usuario_id = $1', [user.id]);
 
         const queryResponseTransaction = `select 
         transacoes.id, 
@@ -94,7 +94,7 @@ const registerTransaction = async (req, res) => {
         on transacoes.categoria_id = categorias.id 
         where transacoes.id = $1`;
 
-        const responseTransaction = await connection.query(queryResponseTransaction, [allTransaction.rowCount]);
+        const responseTransaction = await connection.query(queryResponseTransaction, [allTransaction.rows[0].max]);
 
         return res.status(201).json(responseTransaction.rows);
     } catch (error) {
@@ -180,10 +180,10 @@ const transactionStatement = async (req, res) => {
 
     try {
 
-        const queryStatementTransaction = 'select sum(valor) from transacoes where usuario_id = $1 group by transacoes.tipo';
+        const queryStatementTransaction = 'select sum(valor), transacoes.tipo from transacoes where usuario_id = $1 group by transacoes.tipo';
         const statementTransaction = await connection.query(queryStatementTransaction, [user.id]);
 
-        console.log(statementTransaction.rows);
+        console.log(statementTransaction);
 
         return res.status(200).json(statementTransaction.rows);
     } catch (error) {
