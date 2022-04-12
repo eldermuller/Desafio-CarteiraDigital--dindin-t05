@@ -21,7 +21,6 @@ routes.use(loginVerify);
 routes.get('/usuario', detailUser);
 routes.put('/usuario', updateUser);
 
-//rever essa endpoint
 routes.get('/categoria', categories);
 
 routes.get('/transacao', listTransactions);
