@@ -4,7 +4,7 @@ import userIcon from '../../assets/user_icon.svg'
 import unlogBtn from '../../assets/unlog_btn.svg'
 
 
-export default function Header({ token }) {
+export default function Header({ token, name }) {
     return (
         <header>
             <div className='header-logo'>
@@ -14,7 +14,7 @@ export default function Header({ token }) {
             {token &&
                 <div className='header-usuario'>
                     <img src={userIcon} alt='User Icon' />
-                    <span>Nome do Usuário</span>
+                    <span>{name}</span>
                     <img src={unlogBtn} alt='Exit' />
                 </div>
             }
