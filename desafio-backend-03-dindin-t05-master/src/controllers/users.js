@@ -3,17 +3,16 @@ const bcrypt = require('bcrypt');
 
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
-
     if (!name) {
-        res.status(400).json({ message: "O campo nome é obrigatório" });
+        return res.status(400).json({ message: "O campo nome é obrigatório" });
     };
 
     if (!email) {
-        res.status(400).json({ message: "O campo email é obrigatório" });
+        return res.status(400).json({ message: "O campo email é obrigatório" });
     };
 
     if (!password) {
-        res.status(400).json({ message: "O campo senha é obrigatório" });
+        return res.status(400).json({ message: "O campo senha é obrigatório" });
     };
 
     try {

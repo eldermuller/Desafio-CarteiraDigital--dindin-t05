@@ -2,22 +2,56 @@ import './styles.css'
 import Header from '../../components/header'
 import Transacao from '../../components/Transacao/transacao'
 import Resumo from '../../components/Resumo/Resumo'
-import { getItem } from '../../utils/storage'
 import filterIcon from '../../assets/filtrar_icon.svg'
 import dateUpArrow from '../../assets/data_up_arrow.svg'
 import fakedata from '../../utils/fakedata'
 import { useEffect, useState } from 'react'
+import { getItem } from '../../utils/storage'
+import api from '../../services/api'
+
+
 
 export default function Main() {
-    // const token = getItem('token')
     const [deleteBoxOpen, setDeleteBoxOpen] = useState(false)
+    const [user, setUser] = useState({ id: null, nome: '', email: '' })
+    const token = getItem('token')
 
+    async function fetchUserData(res, req) {
+        try {
+            const response = await api.get('/usuario',
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
 
+            setUser({ ...response.data })
+        } catch (error) {
+            res.status(400).json(error.response.data.message)
+        }
+    }
 
+    async function fillUserTransactions(res, req) {
+        try {
+            const response = await api.get('/transacao', user) //o que fazer aqui? Lá ele recebe user desestruturado do body
+
+            console.log(response.data);
+        } catch (error) {
+            res.status(400).json(error.response.data.message)
+        }
+    }
+
+    useEffect(() => {
+        fetchUserData()
+        fillUserTransactions()
+    }, [])
+
+    console.log(user);
     return (
         <div className='body-clean'>
             <Header
-                token='token'
+                token={token}
+                name={user.nome}
             />
             <div className='container-main'>
                 <button className='filter-btn' >

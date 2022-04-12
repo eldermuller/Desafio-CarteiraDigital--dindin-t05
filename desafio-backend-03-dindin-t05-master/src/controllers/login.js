@@ -25,6 +25,7 @@ const login = async (req, res) => {
 
         const user = rows[0];
 
+
         const verifiedPassword = await bcrypt.compare(password, user.senha);
 
         if (!verifiedPassword) {

@@ -30,10 +30,6 @@ export default function SignUp() {
     async function handleSubmitSignUp(e) {
         e.preventDefault()
 
-        if (!name || !email || !password || !passwordConfirmation) {
-            return handleErrorMessage('Todos os dados precisam ser preenchidos.')
-        }
-
         if (password !== passwordConfirmation) {
             return handleErrorMessage('A senha não confere.')
         }
@@ -46,8 +42,8 @@ export default function SignUp() {
             })
 
         } catch (error) {
-            handleErrorMessage(error.response.data)
-            return console.log(error.response);
+            handleErrorMessage(error.response.data.message)
+            return console.log(error.response.data.message);
         }
 
         navigate('/')

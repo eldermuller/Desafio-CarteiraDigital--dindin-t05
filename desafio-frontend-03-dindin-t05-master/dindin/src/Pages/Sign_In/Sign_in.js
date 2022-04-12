@@ -5,8 +5,6 @@ import api from '../../services/api'
 import { useEffect, useState } from 'react';
 import { getItem, setItem } from '../../utils/storage';
 
-
-
 function SignIn() {
     const navigate = useNavigate()
     const [email, setEmail] = useState('')
@@ -15,38 +13,40 @@ function SignIn() {
 
     useEffect(() => {
         const token = getItem('token')
-        if (token) { navigate('/main') }
+        if (token) {
+            navigate('/main')
+        }
     })
 
     function handleToSignUp() {
         navigate('/signup')
     }
 
+    function handleErrorMessage(msg) {
+        setDataWarning(msg)
+
+        setTimeout(() => {
+            setDataWarning('')
+        }, 3000)
+        return
+    }
+
     async function handleSubmit(e) {
         e.preventDefault()
-
-        if (!email || !password) {
-            setDataWarning('Favor preencher todos os campos');
-
-            setTimeout(() => {
-                setDataWarning('')
-            }, 3000)
-            return
-        }
 
         try {
             const response = await api.post('/login', {
                 email,
                 password
-            });
+            }
+            );
 
             const token = response.data.token
             setItem('token', token)
-            setItem('id', response.data.info.id)
 
         } catch (error) {
-            setDataWarning(error.response.data)
-            return console.log(error.response.status);
+            handleErrorMessage(error.response.data.message)
+            return console.log(error.response.data.message);
         }
 
         navigate('/main')
