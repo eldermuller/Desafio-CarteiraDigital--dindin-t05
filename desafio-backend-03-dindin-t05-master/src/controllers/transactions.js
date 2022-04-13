@@ -5,7 +5,6 @@ const listTransactions = async (req, res) => {
 
     try {
         const queryTransactionList = `select * from transacoes
-        left join categorias on categorias.id = transacoes.categoria_id
         where transacoes.usuario_id = $1`;
         const transactionList = await connection.query(queryTransactionList, [user.id]);
 

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { format, getDay, parseISO } from 'date-fns'
 
 
-export default function Transacao({ transactionData, deleteBoxOpen, setDeleteBoxOpen }) {
+export default function Transacao({ transData, setTransactionData, deleteBoxOpen, setDeleteBoxOpen, setModalType, openModalRegister }) {
 
     const [localDeleteBox, setLocalDeleteBox] = useState(deleteBoxOpen)
     const [weekDay, setWeekDay] = useState('')
@@ -40,21 +40,26 @@ export default function Transacao({ transactionData, deleteBoxOpen, setDeleteBox
     }
 
     const tipoTransacao = () => {
-        if (transactionData.tipo === 'entrada') {
+        if (transData.tipo === 'entrada') {
             return true
         }
-        if (transactionData.tipo === 'saida') {
+        if (transData.tipo === 'saida') {
             return false
         }
     }
 
     const formattedValue = () => {
-        const valor = (transactionData.valor / 100).toFixed(2)
+        const valor = (transData.valor / 100).toFixed(2)
         return valor.replace('.', ',')
     }
 
+    function handleEditModal() {
+        setModalType(false)
+        openModalRegister()
+    }
+
     useEffect(() => {
-        dateInfo(transactionData.data)
+        dateInfo(transData.data)
     }, [])
 
     return (
@@ -68,10 +73,10 @@ export default function Transacao({ transactionData, deleteBoxOpen, setDeleteBox
                 >{weekDay}</span>
                 <span
                     className='info-descricao info'
-                >{transactionData.descricao}</span>
+                >{transData.descricao}</span>
                 <span
                     className='info-categoria info'
-                >{transactionData.categoria_id}</span>
+                >{transData.categoria_id}</span>
                 <span
                     className='info-valor info'
                     style={tipoTransacao() ? { color: 'rgb(123, 97, 255)' } : { color: 'rgb(250, 140, 16)' }}
@@ -80,6 +85,7 @@ export default function Transacao({ transactionData, deleteBoxOpen, setDeleteBox
                     src={editIcon}
                     alt='edit'
                     className='edit-icon'
+                    onClick={handleEditModal}
                 />
                 <img
                     src={deleteIcon}
