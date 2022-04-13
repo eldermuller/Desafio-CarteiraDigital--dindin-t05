@@ -29,6 +29,7 @@ export default function Main() {
                         Authorization: `Bearer ${token}`
                     }
                 })
+
             return setUser({ ...response.data })
         } catch (error) {
             return res.status(400).json(error.response.data.message)
@@ -56,11 +57,13 @@ export default function Main() {
         setShowModalRegister(true)
     }
 
+
     useEffect(() => {
         fillUserData()
         createTransactionArray()
-        //ver com os professores sobre essa espécie de atraso
-        console.log(transactionArray);
+
+        return () => {
+        }
     }, [])
 
 

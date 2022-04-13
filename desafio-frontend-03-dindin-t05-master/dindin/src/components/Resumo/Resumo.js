@@ -4,9 +4,7 @@ import './styles.css'
 export default function Resumo({ transactionArray, openModalRegister, setModalType }) {
     const [balance, setBalance] = useState({ credit: 0, debit: 0, total: 0 })
 
-    console.log('esse console log  só conseguir startar o resumo');
-
-    useEffect(() => {
+    function calcBalance() {
         let inn = 0
         let out = 0
 
@@ -19,9 +17,12 @@ export default function Resumo({ transactionArray, openModalRegister, setModalTy
             debit: out,
             total: (inn - out)
         })
+    }
 
 
-    }, [])
+    useEffect(() => {
+        calcBalance()
+    }, [transactionArray])
 
     function handleOpenAddRegister() {
         setModalType(true)
