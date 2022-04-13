@@ -7,15 +7,17 @@ import dateUpArrow from '../../assets/data_up_arrow.svg'
 import { useEffect, useState } from 'react'
 import { getItem } from '../../utils/storage'
 import api from '../../services/api'
-import AddRegister from '../../components/adicionar_registro/add_register'
+import ModalRegister from '../../components/modal_registro/modal_register'
 
 
 
 export default function Main() {
     const [deleteBoxOpen, setDeleteBoxOpen] = useState(false)
     const [transactionArray, setTransactionArray] = useState([])
+    const [transactionData, setTransactionData] = useState([])
     const [user, setUser] = useState({ id: null, nome: '', email: '' })
-    const [showAddRegister, setShowAddRegister] = useState(false)
+    const [showModalRegister, setShowModalRegister] = useState(false)
+    const [modalType, setModalType] = useState(null)
     const token = getItem('token')
 
 
@@ -43,14 +45,15 @@ export default function Main() {
                     }
                 })
 
+            console.log(response.data);
             setTransactionArray(response.data);
         } catch (error) {
             return res.status(400).json(error.response.data.message)
         }
     }
 
-    function openAddRegisterModal() {
-        setShowAddRegister(true)
+    function openModalRegister() {
+        setShowModalRegister(true)
     }
 
     useEffect(() => {
@@ -98,9 +101,12 @@ export default function Main() {
                             {transactionArray.map((data) => (
                                 <Transacao
                                     key={data.id}
-                                    transactionData={data}
+                                    transData={data}
+                                    setTransactionData={setTransactionData}
                                     deleteBoxOpen={deleteBoxOpen}
                                     setDeleteBoxOpen={setDeleteBoxOpen}
+                                    setModalType={setModalType}
+                                    openModalRegister={openModalRegister}
                                 />
                             ))}
                         </div>
@@ -108,15 +114,18 @@ export default function Main() {
                     <div className='right-inner-container'>
                         <Resumo
                             transactionArray={transactionArray}
-                            openAddRegisterModal={openAddRegisterModal}
+                            openModalRegister={openModalRegister}
+                            setModalType={setModalType}
                         />
                     </div>
                 </div>
             </div>
-            {showAddRegister &&
-                <AddRegister
-                    showAddRegister={showAddRegister}
-                    setShowAddRegister={setShowAddRegister}
+            {showModalRegister &&
+                <ModalRegister
+                    showModalRegister={showModalRegister}
+                    setShowModalRegister={setShowModalRegister}
+                    modalType={modalType}
+                    transactionData={transactionData}
                 />
             }
         </div>

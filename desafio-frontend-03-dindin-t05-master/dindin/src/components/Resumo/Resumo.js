@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import './styles.css'
 
-export default function Resumo({ transactionArray, openAddRegisterModal }) {
+export default function Resumo({ transactionArray, openModalRegister, setModalType }) {
     const [balance, setBalance] = useState({ credit: 0, debit: 0, total: 0 })
 
-    console.log('esse console log só conseguir startar o resumo');
+    console.log('esse console log  só conseguir startar o resumo');
 
     useEffect(() => {
         let inn = 0
@@ -22,6 +22,11 @@ export default function Resumo({ transactionArray, openAddRegisterModal }) {
 
 
     }, [])
+
+    function handleOpenAddRegister() {
+        setModalType(true)
+        openModalRegister()
+    }
 
     const formattedValue = (v) => {
         const value = (v / 100).toFixed(2)
@@ -48,7 +53,7 @@ export default function Resumo({ transactionArray, openAddRegisterModal }) {
             </div>
             <button
                 className='resumo-btn'
-                onClick={openAddRegisterModal}
+                onClick={handleOpenAddRegister}
             >
                 Adicionar Registro</button>
         </div>

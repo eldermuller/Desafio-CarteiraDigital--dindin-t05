@@ -5,7 +5,7 @@ import downArrowSelect from '../../assets/down_arrow.svg'
 import api from '../../services/api'
 import { getItem } from '../../utils/storage'
 
-export default function AddRegister({ showAddRegister, setShowAddRegister }) {
+export default function ModalRegister({ showModalRegister, setShowModalRegister, modalType, transactionData }) {
     const [entryType, setEntryType] = useState(true)
     const [categoryList, setCategoryList] = useState([])
     const token = getItem('token')
@@ -78,17 +78,29 @@ export default function AddRegister({ showAddRegister, setShowAddRegister }) {
         setForm({ ...form, data: newDateString })
     }
 
+    function fillEditRegisterModal() {
+        console.log(transactionData);
+    }
+
+    useEffect(() => {
+        if (modalType) { return }
+        fillEditRegisterModal()
+    }, [])
+
     return (
         <>
-            {showAddRegister &&
+            {showModalRegister &&
                 <div className='container-add-register'>
                     <form className='add-register-form'>
                         <div className='form-header'>
-                            <h1>Adicionar Registro</h1>
+                            <h1>{modalType
+                                ? 'Adicionar Registro'
+                                : 'Editar Registro'
+                            }</h1>
                             <img
                                 src={closeBtn}
                                 className='close-btn'
-                                onClick={() => setShowAddRegister(false)}
+                                onClick={() => setShowModalRegister(false)}
                             />
                         </div>
                         <div className='btn-form-div'>
