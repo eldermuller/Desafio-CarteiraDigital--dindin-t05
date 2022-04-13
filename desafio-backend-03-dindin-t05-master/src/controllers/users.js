@@ -76,7 +76,7 @@ const updateUser = async (req, res) => {
         const queryVerifyEmail = 'select * from usuarios where email = $1';
         const verifyEmail = await connection.query(queryVerifyEmail, [email]);
 
-        if (verifyEmail.rows[0]) {
+        if (verifyEmail.rows[0] && user.id !== verifyEmail.rows[0].id) {
             return res.status(400).json({ message: "O e-mail informado já está sendo utilizado por outro usuário." });
         };
 
