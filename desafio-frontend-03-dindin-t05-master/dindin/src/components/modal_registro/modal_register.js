@@ -5,7 +5,7 @@ import downArrowSelect from '../../assets/down_arrow.svg'
 import api from '../../services/api'
 import { getItem } from '../../utils/storage'
 
-export default function ModalRegister({ showModalRegister, setShowModalRegister, modalType }) {
+export default function ModalRegister({ showModalRegister, setShowModalRegister, modalType, transactionData }) {
     const [entryType, setEntryType] = useState(true)
     const [categoryList, setCategoryList] = useState([])
     const token = getItem('token')
@@ -79,10 +79,11 @@ export default function ModalRegister({ showModalRegister, setShowModalRegister,
     }
 
     function fillEditRegisterModal() {
-        console.log('calma');
+        console.log(transactionData);
     }
 
     useEffect(() => {
+        if (modalType) { return }
         fillEditRegisterModal()
     }, [])
 
