@@ -83,6 +83,8 @@
     align-items: center;
     justify-content: center;
 
+    cursor: pointer;
+
     background-color: rgba(121, 120, 217, 1);
     color: white;
 
