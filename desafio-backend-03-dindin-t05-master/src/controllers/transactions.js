@@ -4,7 +4,17 @@ const listTransactions = async (req, res) => {
     const { user } = req;
 
     try {
-        const queryTransactionList = `select * from transacoes
+        const queryTransactionList = `select 
+        transacoes.id, 
+        tipo, 
+        transacoes.descricao, 
+        valor, 
+        data, 
+        usuario_id, 
+        categoria_id, 
+        categorias.descricao as categoria_nome
+        from transacoes
+        left join categorias on categorias.id = transacoes.categoria_id
         where transacoes.usuario_id = $1`;
         const transactionList = await connection.query(queryTransactionList, [user.id]);
 
@@ -36,7 +46,7 @@ const detailTransaction = async (req, res) => {
         const responseTransaction = await connection.query(queryResponseTransaction, [id, user.id]);
 
         if (responseTransaction.rowCount === 0) {
-            res.status(404).json({ message: "Transação não encontrada" });
+            return res.status(404).json({ message: "Transação não encontrada" });
         }
 
         return res.status(200).json(responseTransaction.rows);
@@ -45,7 +55,6 @@ const detailTransaction = async (req, res) => {
     }
 }
 
-//rever isso aqui, quebra depois que você deleta transações
 const registerTransaction = async (req, res) => {
     const { user } = req;
     const { description, amount, date, idcategory, type } = req.body;
@@ -75,7 +84,7 @@ const registerTransaction = async (req, res) => {
             return res.status(400).json({ message: "Não foi possível registrar a transação." });
         }
 
-        const allTransaction = await connection.query('select * from transacoes');
+        const allTransaction = await connection.query('select max(id) from transacoes where usuario_id = $1', [user.id]);
 
         const queryResponseTransaction = `select 
         transacoes.id, 
@@ -91,7 +100,7 @@ const registerTransaction = async (req, res) => {
         on transacoes.categoria_id = categorias.id 
         where transacoes.id = $1`;
 
-        const responseTransaction = await connection.query(queryResponseTransaction, [allTransaction.rowCount]);
+        const responseTransaction = await connection.query(queryResponseTransaction, [allTransaction.rows[0].max]);
 
         return res.status(201).json(responseTransaction.rows);
     } catch (error) {
@@ -170,12 +179,36 @@ const deleteTransaction = async (req, res) => {
         return res.status(400).json({ message: error.message });
     }
 
-}
+};
+
+const transactionStatement = async (req, res) => {
+    const { user } = req;
+
+    try {
+
+        const queryStatementTransaction = 'select sum(valor), transacoes.tipo from transacoes where usuario_id = $1 group by transacoes.tipo';
+        const statementTransaction = await connection.query(queryStatementTransaction, [user.id]);
+
+        const returnObject = {
+            entrada: 0,
+            saida: 0
+        }
+
+        const rows = statementTransaction.rows
+
+        rows.forEach(statement => returnObject[statement.tipo] = statement.sum);
+
+        return res.status(200).json(returnObject);
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+};
 
 module.exports = {
     listTransactions,
     detailTransaction,
     registerTransaction,
     updateTransaction,
-    deleteTransaction
+    deleteTransaction,
+    transactionStatement
 }
