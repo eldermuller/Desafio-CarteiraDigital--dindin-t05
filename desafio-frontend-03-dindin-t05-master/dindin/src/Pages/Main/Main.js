@@ -4,19 +4,24 @@ import Transacao from '../../components/Transacao/transacao'
 import Resumo from '../../components/Resumo/Resumo'
 import filterIcon from '../../assets/filtrar_icon.svg'
 import dateUpArrow from '../../assets/data_up_arrow.svg'
-import fakedata from '../../utils/fakedata'
 import { useEffect, useState } from 'react'
 import { getItem } from '../../utils/storage'
 import api from '../../services/api'
+import ModalRegister from '../../components/modal_registro/modal_register'
 
 
 
 export default function Main() {
     const [deleteBoxOpen, setDeleteBoxOpen] = useState(false)
+    const [transactionArray, setTransactionArray] = useState([])
+    const [transactionData, setTransactionData] = useState([])
     const [user, setUser] = useState({ id: null, nome: '', email: '' })
+    const [showModalRegister, setShowModalRegister] = useState(false)
+    const [modalType, setModalType] = useState(null)
     const token = getItem('token')
 
-    async function fetchUserData(res, req) {
+
+    async function fillUserData(res, req) {
         try {
             const response = await api.get('/usuario',
                 {
@@ -24,34 +29,46 @@ export default function Main() {
                         Authorization: `Bearer ${token}`
                     }
                 })
-
-            setUser({ ...response.data })
+            return setUser({ ...response.data })
         } catch (error) {
-            res.status(400).json(error.response.data.message)
+            return res.status(400).json(error.response.data.message)
         }
     }
 
-    async function fillUserTransactions(res, req) {
+
+    async function createTransactionArray(req, res) {
         try {
-            const response = await api.get('/transacao', user) //o que fazer aqui? Lá ele recebe user desestruturado do body
+            const response = await api.get('/transacao',
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
 
             console.log(response.data);
+            setTransactionArray(response.data);
         } catch (error) {
-            res.status(400).json(error.response.data.message)
+            return res.status(400).json(error.response.data.message)
         }
+    }
+
+    function openModalRegister() {
+        setShowModalRegister(true)
     }
 
     useEffect(() => {
-        fetchUserData()
-        fillUserTransactions()
+        fillUserData()
+        createTransactionArray()
+        //ver com os professores sobre essa espécie de atraso
+        console.log(transactionArray);
     }, [])
 
-    console.log(user);
+
     return (
         <div className='body-clean'>
             <Header
                 token={token}
-                name={user.nome}
+                userName={user.nome}
             />
             <div className='container-main'>
                 <button className='filter-btn' >
@@ -81,22 +98,36 @@ export default function Main() {
                             </div>
                         </div>
                         <div>
-                            {fakedata.map((data) => (
+                            {transactionArray.map((data) => (
                                 <Transacao
                                     key={data.id}
-                                    transactionData={data}
+                                    transData={data}
+                                    setTransactionData={setTransactionData}
                                     deleteBoxOpen={deleteBoxOpen}
                                     setDeleteBoxOpen={setDeleteBoxOpen}
+                                    setModalType={setModalType}
+                                    openModalRegister={openModalRegister}
                                 />
                             ))}
                         </div>
                     </div>
                     <div className='right-inner-container'>
                         <Resumo
+                            transactionArray={transactionArray}
+                            openModalRegister={openModalRegister}
+                            setModalType={setModalType}
                         />
                     </div>
                 </div>
             </div>
+            {showModalRegister &&
+                <ModalRegister
+                    showModalRegister={showModalRegister}
+                    setShowModalRegister={setShowModalRegister}
+                    modalType={modalType}
+                    transactionData={transactionData}
+                />
+            }
         </div>
 
     )
