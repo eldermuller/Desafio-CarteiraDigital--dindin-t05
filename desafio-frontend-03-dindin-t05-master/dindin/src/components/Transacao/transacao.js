@@ -5,7 +5,13 @@ import { useEffect, useState } from 'react'
 import { format, getDay, parseISO } from 'date-fns'
 
 
-export default function Transacao({ transData, setTransactionData, deleteBoxOpen, setDeleteBoxOpen, setModalType, openModalRegister }) {
+export default function Transacao({
+    transData,
+    setTransactionData,
+    deleteBoxOpen,
+    setDeleteBoxOpen,
+    setModalType,
+    openModalRegister }) {
 
     const [localDeleteBox, setLocalDeleteBox] = useState(deleteBoxOpen)
     const [weekDay, setWeekDay] = useState('')
@@ -59,6 +65,7 @@ export default function Transacao({ transData, setTransactionData, deleteBoxOpen
     }
 
     useEffect(() => {
+        setTransactionData(transData)
         dateInfo(transData.data)
     }, [])
 
