@@ -6,7 +6,7 @@ const loginVerify = async (req, res, next) => {
     const { authorization } = req.headers;
 
     if (!authorization) {
-        res.status(401).json({ message: "Para acessar este recurso um token de autenticação válido deve ser enviado." });
+        return res.status(401).json({ message: "Para acessar este recurso um token de autenticação válido deve ser enviado." });
     };
 
 
@@ -28,7 +28,7 @@ const loginVerify = async (req, res, next) => {
 
         next();
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        return res.status(400).json({ message: error.message });
     };
 
 };

@@ -3,7 +3,8 @@ const connection = require('../connection');
 const categoryList = async (req, res) => {
 
     try {
-        const categories = await connection.query(`select * from categorias`);
+
+        const categories = await connection.query(`select  * from categorias`);
 
         return res.status(200).json(categories.rows);
     } catch (error) {

@@ -2,11 +2,54 @@ const connection = require('../connection');
 
 const listTransactions = async (req, res) => {
     const { user } = req;
+    const { filtro } = req.query;
 
     try {
-        const queryTransactionList = `select * from transacoes
-        where transacoes.usuario_id = $1`;
-        const transactionList = await connection.query(queryTransactionList, [user.id]);
+
+        if (!filtro) {
+            const queryTransactionList = `select 
+            transacoes.id, 
+            tipo, 
+            transacoes.descricao, 
+            valor, 
+            data, 
+            usuario_id, 
+            categoria_id, 
+            categorias.descricao as categoria_nome
+            from transacoes
+            left join categorias on categorias.id = transacoes.categoria_id
+            where transacoes.usuario_id = $1`;
+            const transactionList = await connection.query(queryTransactionList, [user.id]);
+
+            return res.status(200).json(transactionList.rows);
+        };
+
+        const filtroQuery = filtro.map((item, index) => {
+            if (index > 0) {
+                return ` or transacoes.usuario_id = $1 and categorias.descricao = $${index + 2}`
+            };
+
+            return ` transacoes.usuario_id = $1 and categorias.descricao = $${index + 2}`
+        });
+
+        let queryTransactionList = `select 
+        transacoes.id, 
+        tipo, 
+        transacoes.descricao, 
+        valor, 
+        data, 
+        usuario_id, 
+        categoria_id, 
+        categorias.descricao as categoria_nome
+        from transacoes
+        left join categorias on categorias.id = transacoes.categoria_id
+        where `;
+
+        for (let item of filtroQuery) {
+            queryTransactionList = queryTransactionList + item;
+        };
+
+        const transactionList = await connection.query(queryTransactionList, [user.id, ...filtro]);
 
         return res.status(200).json(transactionList.rows);
     } catch (error) {
@@ -36,7 +79,7 @@ const detailTransaction = async (req, res) => {
         const responseTransaction = await connection.query(queryResponseTransaction, [id, user.id]);
 
         if (responseTransaction.rowCount === 0) {
-            res.status(404).json({ message: "Transação não encontrada" });
+            return res.status(404).json({ message: "Transação não encontrada" });
         }
 
         return res.status(200).json(responseTransaction.rows);
@@ -45,18 +88,9 @@ const detailTransaction = async (req, res) => {
     }
 }
 
-//rever isso aqui, quebra depois que você deleta transações
 const registerTransaction = async (req, res) => {
     const { user } = req;
     const { description, amount, date, idcategory, type } = req.body;
-
-    if (!description || !amount || !date || !idcategory || !type) {
-        return res.status(400).json({ message: "Todos os campos obrigatórios devem ser informados." });
-    };
-
-    if (type !== "entrada" && type !== "saida") {
-        return res.status(400).json({ message: "Defina o campo 'tipo' como 'entrada' ou 'saida'." })
-    };
 
     try {
         const checkCategory = await connection.query('select * from categorias where id = $1', [idcategory]);
@@ -75,7 +109,7 @@ const registerTransaction = async (req, res) => {
             return res.status(400).json({ message: "Não foi possível registrar a transação." });
         }
 
-        const allTransaction = await connection.query('select * from transacoes');
+        const allTransaction = await connection.query('select max(id) from transacoes where usuario_id = $1', [user.id]);
 
         const queryResponseTransaction = `select 
         transacoes.id, 
@@ -91,7 +125,7 @@ const registerTransaction = async (req, res) => {
         on transacoes.categoria_id = categorias.id 
         where transacoes.id = $1`;
 
-        const responseTransaction = await connection.query(queryResponseTransaction, [allTransaction.rowCount]);
+        const responseTransaction = await connection.query(queryResponseTransaction, [allTransaction.rows[0].max]);
 
         return res.status(201).json(responseTransaction.rows);
     } catch (error) {
@@ -103,14 +137,6 @@ const updateTransaction = async (req, res) => {
     const { user } = req;
     const { id } = req.params;
     const { description, amount, date, idcategory, type } = req.body;
-
-    if (!description || !amount || !date || !idcategory || !type) {
-        return res.status(400).json({ message: "Todos os campos obrigatórios devem ser informados." });
-    };
-
-    if (type !== "entrada" && type !== "saida") {
-        return res.status(400).json({ message: "Defina o campo 'tipo' como 'entrada' ou 'saida'." })
-    };
 
     try {
         const checkCategory = await connection.query('select * from categorias where id = $1', [idcategory]);
@@ -170,12 +196,36 @@ const deleteTransaction = async (req, res) => {
         return res.status(400).json({ message: error.message });
     }
 
-}
+};
+
+const transactionStatement = async (req, res) => {
+    const { user } = req;
+
+    try {
+
+        const queryStatementTransaction = 'select sum(valor), transacoes.tipo from transacoes where usuario_id = $1 group by transacoes.tipo';
+        const statementTransaction = await connection.query(queryStatementTransaction, [user.id]);
+
+        const returnObject = {
+            entrada: 0,
+            saida: 0
+        }
+
+        const rows = statementTransaction.rows
+
+        rows.forEach(statement => returnObject[statement.tipo] = statement.sum);
+
+        return res.status(200).json(returnObject);
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+};
 
 module.exports = {
     listTransactions,
     detailTransaction,
     registerTransaction,
     updateTransaction,
-    deleteTransaction
+    deleteTransaction,
+    transactionStatement
 }
