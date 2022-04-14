@@ -11,11 +11,15 @@ export default function Transacao({
     deleteBoxOpen,
     setDeleteBoxOpen,
     setModalType,
-    openModalRegister }) {
+    openModalRegister,
+    categoryList
+}) {
 
     const [localDeleteBox, setLocalDeleteBox] = useState(deleteBoxOpen)
     const [weekDay, setWeekDay] = useState('')
     const [formattedDate, setFormattedDate] = useState('')
+    const [currentCategory, setCurrentCategory] = useState('')
+    const [localDescription, setLocalDescription] = useState('')
 
 
     function handleDeleteConfirmation() {
@@ -45,6 +49,15 @@ export default function Transacao({
 
     }
 
+    function categoryDescription() {
+
+        const categoryName = categoryList.find((c) => {
+            return c.id === transData.categoria_id
+        })
+
+        setCurrentCategory(categoryName.descricao)
+    }
+
     const tipoTransacao = () => {
         if (transData.tipo === 'entrada') {
             return true
@@ -61,12 +74,26 @@ export default function Transacao({
 
     function handleEditModal() {
         setModalType(false)
+        setTransactionData({ ...transData })
         openModalRegister()
     }
 
     useEffect(() => {
-        setTransactionData(transData)
+        return () => {
+        }
+    }, [currentCategory])
+
+    useEffect(() => {
+        categoryDescription()
+        return () => {
+        }
+    }, [weekDay])
+
+    useEffect(() => {
         dateInfo(transData.data)
+        setLocalDescription(transData.descricao)
+        return () => {
+        }
     }, [])
 
     return (
@@ -80,10 +107,10 @@ export default function Transacao({
                 >{weekDay}</span>
                 <span
                     className='info-descricao info'
-                >{transData.descricao}</span>
+                >{localDescription}</span>
                 <span
                     className='info-categoria info'
-                >{transData.categoria_id}</span>
+                >{currentCategory}</span>
                 <span
                     className='info-valor info'
                     style={tipoTransacao() ? { color: 'rgb(123, 97, 255)' } : { color: 'rgb(250, 140, 16)' }}

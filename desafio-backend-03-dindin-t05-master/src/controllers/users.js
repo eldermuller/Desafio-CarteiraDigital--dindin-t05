@@ -34,6 +34,7 @@ const registerUser = async (req, res) => {
 const detailUser = async (req, res) => {
     const { user } = req;
 
+
     try {
         const userDatas = await connection.query('select * from usuarios where id = $1', [user.id]);
 
@@ -48,6 +49,7 @@ const detailUser = async (req, res) => {
 const updateUser = async (req, res) => {
     const { name, email, password } = req.body;
     const { user } = req;
+
 
     try {
         const queryVerifyEmail = 'select * from usuarios where email = $1';
