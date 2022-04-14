@@ -125,7 +125,7 @@
     background-color: rgba(255, 87, 107, 1);
 }
 
-
-.right-inner-container {
-    width: 20%;
+.delete-icon:hover,
+.edit-icon:hover {
+    transform: scale(1.1);
 }

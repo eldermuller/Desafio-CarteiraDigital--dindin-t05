@@ -6,15 +6,21 @@ export default function FilterBox({ categoryList }) {
     const [applyFilter, setApplyFilter] = useState(false)
     const [selectedCategories, setSelectedCategories] = useState([])
     const [noSelection, setNoSelection] = useState(true)
+    const [clearClick, setClearClick] = useState(false)
 
     function handleApplyFilter() {
         setApplyFilter(!applyFilter)
     }
 
     function handleClearFilter() {
+        setClearClick(true)
         setSelectedCategories([])
         setApplyFilter(false)
         setNoSelection(true)
+
+        setTimeout(() => {
+            setClearClick(false)
+        }, 100)
     }
 
     useEffect(() => {
@@ -41,18 +47,20 @@ export default function FilterBox({ categoryList }) {
             </div>
             <div className='filter-btns'>
                 <button
-                    className='limpar-filtro-btn'
+                    className={clearClick
+                        ? 'limpar-filtro-clicked'
+                        : 'limpar-filtro-btn'
+                    }
                     onClick={() => handleClearFilter()}
                 >
                     Limpar Filtros
                 </button>
                 <button
-                    className='aplicar-filtro-btn'
-                    onClick={() => handleApplyFilter()}
-                    style={applyFilter
-                        ? { backgroundColor: 'rgb(121, 120, 217)', color: 'white' }
-                        : { backgroundColor: '#FAFAFA', color: 'black' }
+                    className={applyFilter
+                        ? 'aplicar-filtro-clicked'
+                        : 'aplicar-filtro-btn'
                     }
+                    onClick={() => handleApplyFilter()}
                 >
                     Aplicar Filtros</button>
             </div>

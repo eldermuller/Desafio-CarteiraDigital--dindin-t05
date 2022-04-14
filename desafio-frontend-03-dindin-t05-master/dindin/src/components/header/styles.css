@@ -37,6 +37,7 @@ header h2 {
     font-weight: 700;
 }
 
+.user-icon,
 .log-off-btn {
     cursor: pointer;
 }

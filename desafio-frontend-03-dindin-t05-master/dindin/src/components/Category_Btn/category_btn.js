@@ -26,12 +26,10 @@ export default function CategoryBtn({ category, selectedCategories, setSelectedC
 
     useEffect(() => {
         if (noSelection) {
-            console.log(`useEffect no category_btn com ${category.descricao}`);
             setLocalSelectedCategory(false)
         }
 
         return () => {
-            console.log(`desmontando ${category.descricao}`);
         }
     })
 
@@ -39,12 +37,11 @@ export default function CategoryBtn({ category, selectedCategories, setSelectedC
         <div>
             <button
                 key={category.id}
-                className='category-btn'
-                onClick={() => handleSelectCategory(category.id)}
-                style={localSelectedCategory
-                    ? { backgroundColor: 'rgb(121, 120, 217)', color: 'white' }
-                    : { backgroundColor: 'rgb(250, 250, 250)', color: 'black' }
+                className={localSelectedCategory
+                    ? 'category-btn-clicked'
+                    : 'category-btn'
                 }
+                onClick={() => handleSelectCategory(category.id)}
             >
                 {category.descricao}
                 <img

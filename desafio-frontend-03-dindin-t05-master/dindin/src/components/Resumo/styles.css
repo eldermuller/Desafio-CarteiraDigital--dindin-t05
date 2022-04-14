@@ -92,3 +92,8 @@
     font-size: 14px;
     font-weight: 700;
 }
+
+.resumo-btn:hover {
+    cursor: pointer;
+    opacity: 0.8;
+}

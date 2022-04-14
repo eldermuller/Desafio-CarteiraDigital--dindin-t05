@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 
 
-export default function Header({ token, userName }) {
+export default function Header({ token, userName, setShowModalUser }) {
     const navigate = useNavigate()
     const [firstName, setFirstName] = useState('')
 
@@ -34,7 +34,12 @@ export default function Header({ token, userName }) {
             </div>
             {token &&
                 <div className='header-usuario'>
-                    <img src={userIcon} alt='User Icon' />
+                    <img
+                        src={userIcon}
+                        alt='User Icon'
+                        className='user-icon'
+                        onClick={() => setShowModalUser(true)}
+                    />
                     <span>{firstName}</span>
                     <img
                         src={unlogBtn}
