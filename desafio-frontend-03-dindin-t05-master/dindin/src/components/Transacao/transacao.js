@@ -3,19 +3,26 @@ import editIcon from '../../assets/edit_icon.svg'
 import deleteIcon from '../../assets/delete_icon.svg'
 import { useEffect, useState } from 'react'
 import { format, getDay, parseISO } from 'date-fns'
+import api from '../../services/api'
 
 
 export default function Transacao({
+    token,
     transData,
     setTransactionData,
+    createTransactionArray,
     deleteBoxOpen,
     setDeleteBoxOpen,
     setModalType,
-    openModalRegister }) {
+    openModalRegister,
+    categoryList
+}) {
 
     const [localDeleteBox, setLocalDeleteBox] = useState(deleteBoxOpen)
     const [weekDay, setWeekDay] = useState('')
     const [formattedDate, setFormattedDate] = useState('')
+    const [currentCategory, setCurrentCategory] = useState('')
+    const [localDescription, setLocalDescription] = useState('')
 
 
     function handleDeleteConfirmation() {
@@ -27,6 +34,23 @@ export default function Transacao({
     function handleDeleteCancel() {
         setDeleteBoxOpen(false)
         setLocalDeleteBox(false)
+    }
+
+    async function handleDeleteTransaction(res, req) {
+
+        try {
+            await api.delete(`/transacao/${transData.id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+        } catch (error) {
+            return res.status(400).json(error.response.data.message)
+        }
+
+        setDeleteBoxOpen(false)
+        setLocalDeleteBox(false)
+        createTransactionArray()
     }
 
     function dateInfo(date) {
@@ -45,6 +69,14 @@ export default function Transacao({
 
     }
 
+    function categoryDescription() {
+        const categoryName = categoryList.find((c) => {
+            return c.id === transData.categoria_id
+        })
+
+        setCurrentCategory(categoryName.descricao)
+    }
+
     const tipoTransacao = () => {
         if (transData.tipo === 'entrada') {
             return true
@@ -61,12 +93,28 @@ export default function Transacao({
 
     function handleEditModal() {
         setModalType(false)
+        setTransactionData({ ...transData })
         openModalRegister()
     }
 
     useEffect(() => {
-        setTransactionData(transData)
+        console.log('useEffect 3 do transacao');
+
+        return () => {
+            console.log('desmontei - useEffect 3 do transacao');
+        }
+    }, [currentCategory])
+
+
+    useEffect(() => {
+        console.log('useEffect 1 do transacao');
+        setLocalDescription(transData.descricao)
         dateInfo(transData.data)
+        categoryDescription()
+
+        return () => {
+            console.log('desmontei - useEffect 1 do transacao');
+        }
     }, [])
 
     return (
@@ -80,10 +128,10 @@ export default function Transacao({
                 >{weekDay}</span>
                 <span
                     className='info-descricao info'
-                >{transData.descricao}</span>
+                >{localDescription}</span>
                 <span
                     className='info-categoria info'
-                >{transData.categoria_id}</span>
+                >{currentCategory}</span>
                 <span
                     className='info-valor info'
                     style={tipoTransacao() ? { color: 'rgb(123, 97, 255)' } : { color: 'rgb(250, 140, 16)' }}
@@ -108,7 +156,7 @@ export default function Transacao({
                             <div className='delete-confirmation-btns'>
                                 <button
                                     className='sim-delete'
-                                    onClick={handleDeleteCancel}
+                                    onClick={handleDeleteTransaction}
                                 >
                                     Sim</button>
                                 <button

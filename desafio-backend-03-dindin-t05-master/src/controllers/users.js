@@ -3,17 +3,6 @@ const bcrypt = require('bcrypt');
 
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
-    if (!name) {
-        return res.status(400).json({ message: "O campo nome é obrigatório" });
-    };
-
-    if (!email) {
-        return res.status(400).json({ message: "O campo email é obrigatório" });
-    };
-
-    if (!password) {
-        return res.status(400).json({ message: "O campo senha é obrigatório" });
-    };
 
     try {
         const queryEmailConsult = 'select * from usuarios where email = $1';
@@ -45,6 +34,7 @@ const registerUser = async (req, res) => {
 const detailUser = async (req, res) => {
     const { user } = req;
 
+
     try {
         const userDatas = await connection.query('select * from usuarios where id = $1', [user.id]);
 
@@ -60,17 +50,6 @@ const updateUser = async (req, res) => {
     const { name, email, password } = req.body;
     const { user } = req;
 
-    if (!name) {
-        res.status(400).json({ message: "O campo nome é obrigatório" });
-    };
-
-    if (!email) {
-        res.status(400).json({ message: "O campo email é obrigatório" });
-    };
-
-    if (!password) {
-        res.status(400).json({ message: "O campo senha é obrigatório" });
-    };
 
     try {
         const queryVerifyEmail = 'select * from usuarios where email = $1';
